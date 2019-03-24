@@ -3,6 +3,22 @@
     <br /><br />
     <button v-on:click="errors.clear()" data-toggle="modal" data-target="#modal-format" class="btn btn-info btn-sm"><font-awesome-icon icon="plus"/> New format</button>
     <br /><br />
+    <table class="table table-striped table-bordered" width="50%">
+      <Tr>
+        <th>Letter Name</th>
+        <th>HTML Output</th>
+        <th>Action</th>
+      </Tr>
+      <tr v-for="data in dataFormat">
+        <td>{{data.name}}</td>
+        <td><button v-on:click="viewData(data.id)" class="btn btn-md btn-info btn-sm" data-toggle="modal" data-target="#modal-view"><font-awesome-icon icon="eye"/></button></td>
+        <td style="text-align:center">
+          <button v-on:click="editComponent(data.id)" class="btn btn-md btn-warning btn-sm" data-toggle="modal" data-target="#modal-form"><font-awesome-icon icon="pen"/></button>
+          <button v-on:click="destroy(data.id)" class="btn btn-md btn-danger btn-sm"><font-awesome-icon icon="trash"/></button>
+        </td>
+      </tr>
+
+    </table>
     <!-- MODAL FORM FORMAT LETTER -->
     <div id="modal-format" class="modal fade" role="dialog">
       <div class="modal-dialog modal-lg">
@@ -36,6 +52,32 @@
       </div>
     </div>
     <!-- END OF MODAL FORM FORMAT LETTER -->
+
+    <div id="modal-view" class="modal fade" role="dialog">
+      <div class="modal-dialog modal-lg">
+        <!-- Modal content-->
+        <div class="modal-content ">
+          <div class="modal-header">
+            <h5 class="modal-title">{{view_data.name}}</h5>
+            <button type="button" class="pull-right close" data-dismiss="modal">&times;</button>
+          </div>
+          <div class="modal-body">
+            <div style="text-align:right">
+              <input type="checkbox" id="checkbox" v-model="checked"/> HTML
+            </div>
+            <br /><br />
+
+            <div v-if="checked===false" v-html="view_data.output_template"></div>
+            <div v-if="checked===true">{{view_data.output_template}}</div>
+
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+          </div>
+        </div>
+
+      </div>
+    </div>
   </div>
 
 </template>
@@ -52,7 +94,10 @@
         variable_name: [],
         editor: ClassicEditor,
         formatLetter: '',
+        checked: false,
         letterName: '',
+        dataFormat: [],
+        view_data:[],
         editorConfig: {
             // toolbar: [ 'bold', 'italic', 'bulletedList', 'numberedList', 'list', 'Underline', 'Strike' ],
             height: 800
@@ -62,21 +107,84 @@
 
     mounted(){
       this.loadVariable()
+      this.loadData()
     },
 
     methods: {
       save(){
         this.$validator.validate().then(valid => {
             if (valid) {
+              this.$validator.validate().then(valid => {
+                  if (valid) {
+                    const newComponent = new URLSearchParams()
+                    newComponent.append('letter_name', this.letterName)
+                    newComponent.append('html_output', this.formatLetter)
 
+                    axios.post('http://127.0.0.1/e-letter/format/create', newComponent)
+                    .then((response) => {
+                      this.init()
+                      $('#modal-format').modal('hide');
+                      this.$swal({
+                        position: 'top-end',
+                        type: 'success',
+                        title: 'Data saved successful',
+                        showConfirmButton: false,
+                        timer: 1500
+                      })
+                    })
+                    .catch((e) => {
+                      console.log(e)
+                    })
+                  }
+                })
             }
         })
+      },
+
+      deleteComponent(id){
+        axios.delete('http://127.0.0.1/e-letter/format/delete/' + id)
+        .then(response => {
+          this.init()
+        })
+      },
+
+      destroy(id) {
+        this.$swal({
+            title: 'Are you sure?',
+            text: "You won't be able to revert this!",
+            type: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes, delete it!'
+          }).then((result) => {
+
+            if (result.value) {
+              this.deleteComponent(id)
+              this.init()
+              this.$swal({
+                position: 'top-end',
+                type: 'success',
+                title: 'Data deleted successful',
+                showConfirmButton: false,
+                timer: 1500
+              })
+            }
+          })
       },
 
       async loadVariable(){
         const response = await axios.get('http://127.0.0.1/e-letter/component/variableName')
         this.variable_name = response.data
-        console.log(this.variable_name)
+      },
+
+      async loadData(){
+        const response = await axios.get('http://127.0.0.1/e-letter/format')
+        this.dataFormat = response.data
+      },
+
+      viewData(id) {
+        this.view_data = this.dataFormat.find(x => x.id === id)
       },
 
       resetForm(){
