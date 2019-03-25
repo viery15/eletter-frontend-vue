@@ -106,8 +106,7 @@
     },
 
     mounted(){
-      this.loadVariable()
-      this.loadData()
+      this.init()
     },
 
     methods: {
@@ -139,6 +138,11 @@
                 })
             }
         })
+      },
+
+      init(){
+        this.loadVariable()
+        this.loadData()
       },
 
       deleteComponent(id){
