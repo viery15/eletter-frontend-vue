@@ -35,15 +35,16 @@
               <span style="color:red">{{ errors.first('letter_name') }}</span>
             </div>
             <div class="checkbox">
-              <label><input type="checkbox" value="config" v-model="dataSource"> Generate data from config</label>
+              <label><input type="checkbox" value="config" v-model="dataSource"> Generate with config variable</label>
             </div>
             <br />
             <label for="usr">Letter Format: * </label><br />
             <span style="color:red">{{ errors.first('letter_format') }}</span>
             <div v-html="formatLetter"></div>
             <br /><br />
+
             <at :members="variable_name">
-              <ckeditor @ready="onReady" name="letter_format" v-validate="'required'" :editor="editor" v-model="formatLetter" :config="editorConfig"></ckeditor>
+              <ckeditor @ready="onReady" style="border:1px solid lightgray;margin-top:5px;" name="letter_format" v-validate="'required'" :editor="editor" v-model="formatLetter" :config="editorConfig"></ckeditor>
             </at>
 
           </div>

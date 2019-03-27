@@ -36,18 +36,28 @@
                     <h6>Basic Setting</h6><hr />
                     <form id='input-component'>
                     <div class="form-group">
-                      <label for="usr">Name: * </label><br />
+                      <label for="usr">Label: * </label><br />
                       <input name="name" v-validate="'required'" autocomplete="off" v-model="inputComponent.name" type="text" class="form-control">
                       <span style="color:red">{{ errors.first('name') }}</span>
                     </div>
                     <div class="form-group">
+                      <div class="checkbox">
+                        <label><input type="checkbox" value="config" v-model="fromConfig"> Generate with config variable </label>
+                      </div>
+                    </div>
+                    <div class="form-group">
                       <label for="usr">Variable Name: * </label>
-                      <input v-validate="'required'" name="variable_name" autocomplete="off" v-model="inputComponent.variable_name" type="text" class="form-control">
+                      <input v-if="fromConfig == false" v-validate="'required'" name="variable_name" autocomplete="off" v-model="inputComponent.variable_name" type="text" class="form-control">
+                      <select v-if="fromConfig == true" name="variable_name" v-validate="'required'" class="form-control" v-model="inputComponent.variable_name">
+                        <option value="" disabled selected>Select NIK</option>
+                        <option v-for='data in dataConfig'>{{data}}</option>
+                      </select>
                       <span style="color:red">{{ errors.first('variable_name') }}</span>
                     </div>
                     <div class="form-group">
                       <label for="sel1">Input type: * </label>
-                      <select name="type" v-validate="'required'" v-on:change="onChange($event)" class="form-control" v-model="inputComponent.type">
+                      <input readonly v-if="fromConfig == true" v-validate="'required'" name="type" autocomplete="off" v-model="inputComponent.type = 'text'" type="text" class="form-control">
+                      <select v-if="fromConfig == false" name="type" v-validate="'required'" v-on:change="onChange($event)" class="form-control" v-model="inputComponent.type">
                         <option value="" disabled selected>Select input type</option>
                         <option v-for='input in inputType'>{{input}}</option>
                       </select>
@@ -158,6 +168,9 @@
         data_input: [],
         inputComponent: {},
         view_data:[],
+        selectedConfig: '',
+        fromConfig: '',
+        dataConfig: [],
         alert: false,
         attributs: [{
           attribut: '',
@@ -178,6 +191,7 @@
 
     mounted() {
       this.init()
+      this.getConfig();
     },
 
     methods: {
@@ -185,6 +199,17 @@
         axios.get('http://127.0.0.1/e-letter/component/index2')
         .then((response) => {
           this.components = response.data
+        })
+        .catch((e) => {
+          console.log(e)
+        })
+      },
+
+      getConfig(){
+        axios.get('http://127.0.0.1/e-letter/component/config')
+        .then((response) => {
+          this.dataConfig = response.data
+          console.log(this.dataConfig)
         })
         .catch((e) => {
           console.log(e)
