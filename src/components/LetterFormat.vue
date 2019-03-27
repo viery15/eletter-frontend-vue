@@ -1,7 +1,7 @@
 <template>
   <div>
     <br /><br />
-    <button v-on:click="errors.clear()" data-toggle="modal" data-target="#modal-format" class="btn btn-info btn-sm"><font-awesome-icon icon="plus"/> New format</button>
+    <button v-on:click="createData()" data-toggle="modal" data-target="#modal-format" class="btn btn-info btn-sm"><font-awesome-icon icon="plus"/> New format</button>
     <br /><br />
     <table class="table table-striped table-bordered" width="50%">
       <Tr>
@@ -13,7 +13,7 @@
         <td>{{data.name}}</td>
         <td><button v-on:click="viewData(data.id)" class="btn btn-md btn-info btn-sm" data-toggle="modal" data-target="#modal-view"><font-awesome-icon icon="eye"/></button></td>
         <td style="text-align:center">
-          <button v-on:click="editComponent(data.id)" class="btn btn-md btn-warning btn-sm" data-toggle="modal" data-target="#modal-form"><font-awesome-icon icon="pen"/></button>
+          <button v-on:click="editComponent(data.id)" class="btn btn-md btn-warning btn-sm" data-toggle="modal" data-target="#modal-format"><font-awesome-icon icon="pen"/></button>
           <button v-on:click="destroy(data.id)" class="btn btn-md btn-danger btn-sm"><font-awesome-icon icon="trash"/></button>
         </td>
       </tr>
@@ -34,6 +34,9 @@
               <input v-validate="'required'" name="letter_name" v-model="letterName" autocomplete="off" type="text" class="form-control">
               <span style="color:red">{{ errors.first('letter_name') }}</span>
             </div>
+            <div class="checkbox">
+              <label><input type="checkbox" value="config" v-model="dataSource"> Generate data from config</label>
+            </div>
             <br />
             <label for="usr">Letter Format: * </label><br />
             <span style="color:red">{{ errors.first('letter_format') }}</span>
@@ -45,7 +48,8 @@
 
           </div>
           <div class="modal-footer">
-            <button v-on:click="save()" class="btn btn-success">Save</button>
+            <button v-if="action==='save'" v-on:click="save()" class="btn btn-success">Save</button>
+            <button v-if="action==='update'" v-on:click="update()" class="btn btn-success">Update</button>
             <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
           </div>
         </div>
@@ -86,6 +90,7 @@
   import ClassicEditor from '@ckeditor/ckeditor5-build-classic'
   import axios from 'axios'
   import At from 'vue-at'
+
   export default {
     components: { At },
     nam: 'LetterFormat',
@@ -98,6 +103,8 @@
         letterName: '',
         dataFormat: [],
         view_data:[],
+        action:'',
+        dataSource:'',
         editorConfig: {
             // toolbar: [ 'bold', 'italic', 'bulletedList', 'numberedList', 'list', 'Underline', 'Strike' ],
             height: 800
@@ -118,11 +125,13 @@
                     const newComponent = new URLSearchParams()
                     newComponent.append('letter_name', this.letterName)
                     newComponent.append('html_output', this.formatLetter)
+                    newComponent.append('data_source', this.dataSource)
 
                     axios.post('http://127.0.0.1/e-letter/format/create', newComponent)
                     .then((response) => {
                       this.init()
                       $('#modal-format').modal('hide');
+                      this.resetForm()
                       this.$swal({
                         position: 'top-end',
                         type: 'success',
@@ -143,6 +152,11 @@
       init(){
         this.loadVariable()
         this.loadData()
+      },
+
+      createData(){
+        this.errors.clear()
+        this.action = 'save'
       },
 
       deleteComponent(id){
@@ -177,6 +191,39 @@
           })
       },
 
+      editComponent(id){
+        this.action = 'update'
+        this.letterName = this.dataFormat.find(x => x.id === id).name
+        this.formatLetter = this.dataFormat.find(x => x.id === id).output_template
+        console.log(this.dataFormat)
+      },
+
+      update(id){
+        this.$validator.validate().then(valid => {
+            if (valid) {
+              const newComponent = new URLSearchParams()
+              newComponent.append('letter_name', this.letterName)
+              newComponent.append('html_output', this.formatLetter)
+
+              axios.post('http://127.0.0.1/e-letter/format/update/'+id, newComponent)
+              .then((response) => {
+                // this.init()
+                // $('#modal-form').modal('hide');
+                // this.$swal({
+                //   position: 'top-end',
+                //   type: 'success',
+                //   title: 'Data updated successful',
+                //   showConfirmButton: false,
+                //   timer: 1500
+                // })
+              })
+              .catch((e) => {
+                console.log(e)
+              })
+            }
+          })
+      },
+
       async loadVariable(){
         const response = await axios.get('http://127.0.0.1/e-letter/component/variableName')
         this.variable_name = response.data
@@ -193,6 +240,8 @@
 
       resetForm(){
         this.errors.clear()
+        this.letterName = ''
+        this.formatLetter = ''
       }
     }
   }

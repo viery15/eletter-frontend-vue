@@ -329,7 +329,6 @@
             }
            }
         }
-
       },
 
       updateComponent(id){
@@ -365,7 +364,6 @@
                 console.log(e)
               })
             }
-
           })
       },
 

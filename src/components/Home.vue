@@ -13,6 +13,18 @@
           </div>
         </div>
         <form id="form-input">
+          <div v-if="inputNik.label != ''">
+            <div class="form-group row" >
+              <label for="colFormLabelSm" class="col-md-3 col-form-label col-form-label-sm">{{inputNik.label}}</label>
+              <div class="col-md-9">
+                <select v-on:change="changeNik()" v-model="selectedNik" name="type" class="form-control form-control-sm">
+                  <option value="" disabled selected>Select NIK</option>
+                  <option v-for="(nik, key) in inputNik.nik" >{{nik.nik}}</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
         <div class="form-group row" v-for="input in inputForm">
           <label for="colFormLabelSm" class="col-md-3 col-form-label col-form-label-sm">{{input.name}}</label>
           <div class="col-md-9">
@@ -29,11 +41,13 @@
 
       </div>
     </div>
+
   </div>
 </template>
 
 <script>
 import axios from 'axios'
+import jsPDF from 'jspdf'
 
 export default {
   name: 'Home',
@@ -44,11 +58,16 @@ export default {
       inputForm: [],
       input:[],
       dataInput:[],
+      html: '',
+      selectedNik:'',
+      inputNik:[],
+      dataNik:[],
     }
   },
 
   mounted(){
     this.init()
+    this.inputNik.label = ''
   },
 
   methods: {
@@ -58,7 +77,7 @@ export default {
 
     submit(){
       this.dataInput = JSON.parse(JSON.stringify(jQuery('#form-input').serializeArray()))
-      
+
       const newComponent = new URLSearchParams()
       newComponent.append('output', this.inputForm[0].output_template)
       for (var i = 0; i < this.dataInput.length; i++) {
@@ -67,7 +86,23 @@ export default {
 
       axios.post('http://127.0.0.1/e-letter/format/submit', newComponent)
       .then((response) => {
-        console.log(response.data)
+        this.html = response.data
+        let pdfName = 'test'
+        var doc = new jsPDF({
+        	orientation: 'p',
+        	unit: 'mm',
+        	format: 'a4',
+        })
+        doc.fromHTML(
+          response.data,
+          20,
+          20,
+
+          {
+            'width': 180,
+          }
+        )
+        doc.save(pdfName + '.pdf')
 
       })
       .catch((e) => {
@@ -83,8 +118,28 @@ export default {
     },
 
     async onChange(){
+      this.clearForm()
       const response = await axios.get('http://127.0.0.1/e-letter/format/formInput/'+this.selectedFormat)
       this.inputForm = response.data
+
+      if (response.data.config != null) {
+        this.inputNik = response.data.config
+        this.inputNik.label = 'NIK'
+        // console.log(this.inputNik)
+      }
+    },
+
+    changeNik(){
+      var findnik = this.inputNik.nik.find(x => x.nik === this.selectedNik)
+      for(var i in findnik){
+        if (i != 'nik') {
+          $('#'+i).val(findnik[i])
+        }
+      }
+    },
+
+    clearForm(){
+      this.inputNik.label = ''
     }
   },
 
