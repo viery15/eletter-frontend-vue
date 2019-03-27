@@ -43,7 +43,7 @@
             <div v-html="formatLetter"></div>
             <br /><br />
             <at :members="variable_name">
-              <ckeditor name="letter_format" v-validate="'required'" :editor="editor" v-model="formatLetter" :config="editorConfig"></ckeditor>
+              <ckeditor @ready="onReady" name="letter_format" v-validate="'required'" :editor="editor" v-model="formatLetter" :config="editorConfig"></ckeditor>
             </at>
 
           </div>
@@ -87,7 +87,8 @@
 </template>
 
 <script>
-  import ClassicEditor from '@ckeditor/ckeditor5-build-classic'
+  // import ClassicEditor from '@ckeditor/ckeditor5-build-classic'
+  import DecoupledEditor from '@ckeditor/ckeditor5-build-decoupled-document'
   import axios from 'axios'
   import At from 'vue-at'
 
@@ -97,7 +98,7 @@
     data(){
       return {
         variable_name: [],
-        editor: ClassicEditor,
+        editor: DecoupledEditor,
         formatLetter: '',
         checked: false,
         letterName: '',
@@ -107,7 +108,7 @@
         dataSource:'',
         editorConfig: {
             // toolbar: [ 'bold', 'italic', 'bulletedList', 'numberedList', 'list', 'Underline', 'Strike' ],
-            height: 800
+            height: 600
         }
       }
     },
@@ -152,6 +153,14 @@
       init(){
         this.loadVariable()
         this.loadData()
+      },
+
+      onReady( editor )  {
+          // Insert the toolbar before the editable area.
+          editor.ui.getEditableElement().parentElement.insertBefore(
+              editor.ui.view.toolbar.element,
+              editor.ui.getEditableElement()
+          );
       },
 
       createData(){

@@ -41,13 +41,16 @@
 
       </div>
     </div>
+    <div id="output" v-html="html">
 
+    </div>
   </div>
 </template>
 
 <script>
 import axios from 'axios'
-import jsPDF from 'jspdf'
+// import jsPDF from 'jspdf'
+import html2pdf from 'html2pdf.js'
 
 export default {
   name: 'Home',
@@ -86,23 +89,39 @@ export default {
 
       axios.post('http://127.0.0.1/e-letter/format/submit', newComponent)
       .then((response) => {
+        // console.log(response.data)
         this.html = response.data
-        let pdfName = 'test'
-        var doc = new jsPDF({
-        	orientation: 'p',
-        	unit: 'mm',
-        	format: 'a4',
-        })
-        doc.fromHTML(
-          response.data,
-          20,
-          20,
+        var element = document.getElementById('output');
 
-          {
-            'width': 180,
-          }
-        )
-        doc.save(pdfName + '.pdf')
+          var opt = {
+            margin: 15,
+            filename: 'myfile.pdf',
+            image: {type: 'jpeg',quality: 0.98},
+            html2canvas: {scale: 2},
+            jsPDF: {
+              unit: 'mm',
+              format: 'a4',
+              orientation: 'portrait'
+            }
+          };
+
+          html2pdf().set(opt).from(element).save();
+        // let pdfName = 'test'
+        // var doc = new jsPDF({
+        // 	orientation: 'p',
+        // 	unit: 'mm',
+        // 	format: 'a4',
+        // })
+        // doc.fromHTML(
+        //   response.data,
+        //   20,
+        //   20,
+        //
+        //   {
+        //     'width': 170,
+        //   }
+        // )
+        // doc.save(pdfName + '.pdf')
 
       })
       .catch((e) => {
