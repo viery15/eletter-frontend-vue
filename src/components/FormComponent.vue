@@ -15,9 +15,9 @@
             <td width='20%'>{{component.variable_name}}</td>
             <td>{{component.html_basic}}</td>
             <td style="text-align:center" width='15%'>
-              <button v-on:click="editComponent(component.id)" class="btn btn-md btn-warning btn-sm" data-toggle="modal" data-target="#modal-form"><font-awesome-icon icon="pen"/></button>
-              <button v-on:click="destroy(component.id)" class="btn btn-md btn-danger btn-sm"><font-awesome-icon icon="trash"/></button>
-              <button v-on:click="view(component.id)" class="btn btn-md btn-info btn-sm" data-toggle="modal" data-target="#modal-view"><font-awesome-icon icon="eye"/></button>
+              <button style="margin-left:5px" v-on:click="editComponent(component.id)" class="btn btn-md btn-warning btn-sm" data-toggle="modal" data-target="#modal-form"><font-awesome-icon icon="pen"/></button>
+              <button style="margin-left:5px" v-on:click="destroy(component.id)" class="btn btn-md btn-danger btn-sm"><font-awesome-icon icon="trash"/></button>
+              <button style="margin-left:5px" v-on:click="view(component.id)" class="btn btn-md btn-info btn-sm" data-toggle="modal" data-target="#modal-view"><font-awesome-icon icon="eye"/></button>
             </td>
           </tr>
         </table>
@@ -169,6 +169,7 @@
         inputComponent: {},
         view_data:[],
         selectedConfig: '',
+        variableConfig: [],
         fromConfig: '',
         dataConfig: [],
         alert: false,
@@ -191,7 +192,8 @@
 
     mounted() {
       this.init()
-      this.getConfig();
+      this.getConfig()
+      this.getVarConfig()
     },
 
     methods: {
@@ -209,7 +211,17 @@
         axios.get('http://127.0.0.1/e-letter/component/config')
         .then((response) => {
           this.dataConfig = response.data
-          console.log(this.dataConfig)
+          // console.log(this.dataConfig)
+        })
+        .catch((e) => {
+          console.log(e)
+        })
+      },
+
+      getVarConfig(){
+        axios.get('http://127.0.0.1/e-letter/component/allConfigVariable')
+        .then((response) => {
+          this.variableConfig = response.data
         })
         .catch((e) => {
           console.log(e)
@@ -217,6 +229,10 @@
       },
 
       async newComponent(){
+        this.getVarConfig()
+        this.getConfig()
+        this.fromConfig = false
+        this.inputComponent = {}
         this.errors.clear()
         this.modal_header = 'New Component'
         const response = await axios.get('http://127.0.0.1/e-letter/component/list_input')
@@ -234,13 +250,20 @@
           countOption: 1
           }
         ]
-
-        this.inputComponent = {}
       },
 
       addComponent(){
         this.$validator.validate().then(valid => {
             if (valid) {
+              if (this.fromConfig == false) {
+                var check = this.variableConfig.find(x => x === this.inputComponent.variable_name)
+                if (check !== undefined) {
+                    console.log(check)
+                    alert(this.inputComponent.variable_name+' is defined in the config. Change variable or check generate with config variable')
+                    return;
+                }
+              }
+
               const newComponent = new URLSearchParams()
               newComponent.append('name', this.inputComponent.name)
               newComponent.append('variable_name', this.inputComponent.variable_name)
@@ -266,6 +289,9 @@
                   showConfirmButton: false,
                   timer: 1500
                 })
+                this.variableConfig = []
+                this.dataConfig = []
+
               })
               .catch((e) => {
                 console.log(e)
@@ -278,6 +304,8 @@
         axios.delete('http://127.0.0.1/e-letter/component/delete/' + id)
         .then(response => {
           this.init()
+          this.getConfig()
+          this.getVarConfig()
         })
       },
 
@@ -307,6 +335,7 @@
 
       editComponent(id){
         this.errors.clear()
+
         this.options = [{
           option: '',
           countOption: 1
@@ -326,6 +355,12 @@
         this.inputComponent.type = this.components.find(x => x.id === id).attribut.type
         this.inputComponent.name = this.components.find(x => x.id === id).name
         this.inputComponent.variable_name = this.components.find(x => x.id === id).variable_name
+        var check = this.variableConfig.find(x => x === this.inputComponent.variable_name)
+
+        if (check !== undefined) {
+          this.fromConfig = true
+          this.dataConfig.push(this.inputComponent.variable_name)
+        }
 
         if (this.inputComponent.type == 'radio' || this.inputComponent.type == 'checkbox' || this.inputComponent.type == 'dropdown') {
           option = this.components.find(x => x.id === id).option
@@ -359,6 +394,15 @@
       updateComponent(id){
         this.$validator.validate().then(valid => {
             if (valid) {
+              if (this.fromConfig == false) {
+                console.log(this.fromConfig)
+                var check = this.variableConfig.find(x => x === this.inputComponent.variable_name)
+                if (check !== undefined) {
+                    console.log(check)
+                    alert(this.inputComponent.variable_name+' is defined in the config. Change variable or check generate with config variable')
+                    return;
+                }
+              }
               const newComponent = new URLSearchParams()
               newComponent.append('name', this.inputComponent.name)
               newComponent.append('variable_name', this.inputComponent.variable_name)
@@ -376,6 +420,8 @@
               .then((response) => {
 
                 this.init()
+                this.getConfig()
+                this.getVarConfig()
                 $('#modal-form').modal('hide');
                 this.$swal({
                   position: 'top-end',
