@@ -119,7 +119,7 @@ export default {
         var element = document.getElementById('output');
 
           var opt = {
-            margin: 19,
+            margin: 13,
             filename: 'myfile.pdf',
             image: {type: 'jpeg',quality: 0.98},
             html2canvas: {scale: 2},

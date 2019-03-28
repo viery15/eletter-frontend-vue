@@ -15,6 +15,7 @@
     "@fortawesome/free-solid-svg-icons": "^5.8.0",
     "@fortawesome/vue-fontawesome": "^0.1.6",
     "axios": "^0.18.0",
+    "babel-runtime": "^6.26.0",
     "bootstrap": "^4.3.1",
     "html2pdf.js": "^0.9.1",
     "jquery": "^3.3.1",
@@ -27,6 +28,7 @@
     "vee-validate": "^2.2.0",
     "vue": "^2.6.6",
     "vue-at": "^2.3.2",
+    "vue-froala-wysiwyg": "^2.9.3",
     "vue-router": "^3.0.2",
     "vue-sweetalert2": "^1.6.4",
     "vueckeditor": "^0.1.4"

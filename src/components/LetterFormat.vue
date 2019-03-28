@@ -40,11 +40,14 @@
             <br />
             <label for="usr">Letter Format: * </label><br />
             <span style="color:red">{{ errors.first('letter_format') }}</span>
-            <div v-html="formatLetter"></div>
-            <br /><br />
+            <!-- <div v-html="formatLetter"></div>
+            <br /><br /> -->
 
-            <at :members="variable_name">
+            <!--
               <ckeditor @ready="onReady" style="border:1px solid lightgray;margin-top:5px;" name="letter_format" v-validate="'required'" :editor="editor" v-model="formatLetter" :config="editorConfig"></ckeditor>
+            <br /><br /> -->
+            <at :members="variable_name">
+              <froala :tag="'textarea'" :config="config" name="letter_format" v-validate="'required'" v-model="formatLetter">Init text</froala>
             </at>
 
           </div>
@@ -105,6 +108,11 @@
         letterName: '',
         dataFormat: [],
         view_data:[],
+        model: '',
+        config: {
+          placeholderText: 'Edit Your Content Here!',
+          charCounterCount: false
+        },
         action:'',
         dataSource:'',
         editorConfig: {
