@@ -258,7 +258,6 @@
               if (this.fromConfig == false) {
                 var check = this.variableConfig.find(x => x === this.inputComponent.variable_name)
                 if (check !== undefined) {
-                    console.log(check)
                     alert(this.inputComponent.variable_name+' is defined in the config. Change variable or check generate with config variable')
                     return;
                 }
@@ -289,9 +288,6 @@
                   showConfirmButton: false,
                   timer: 1500
                 })
-                this.variableConfig = []
-                this.dataConfig = []
-
               })
               .catch((e) => {
                 console.log(e)
@@ -356,7 +352,6 @@
         this.inputComponent.name = this.components.find(x => x.id === id).name
         this.inputComponent.variable_name = this.components.find(x => x.id === id).variable_name
         var check = this.variableConfig.find(x => x === this.inputComponent.variable_name)
-
         if (check !== undefined) {
           this.fromConfig = true
           this.dataConfig.push(this.inputComponent.variable_name)

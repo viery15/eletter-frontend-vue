@@ -41,11 +41,32 @@
 
       </div>
     </div>
-    <div id="output" v-html="html">
 
+    <div id="modalss" class="modal fade" role="dialog">
+      <div class="modal-dialog modal-lg">
+        <!-- Modal content-->
+        <div class="modal-content ">
+          <div class="modal-header">
+
+            <button type="button" class="pull-right close" data-dismiss="modal">&times;</button>
+          </div>
+          <div class="modal-body">
+            <div id="output" v-html="html"></div>
+
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+          </div>
+        </div>
+
+      </div>
     </div>
+
+
   </div>
+
 </template>
+
 
 <script>
 import axios from 'axios'
@@ -84,6 +105,10 @@ export default {
       const newComponent = new URLSearchParams()
       newComponent.append('output', this.inputForm[0].output_template)
       for (var i = 0; i < this.dataInput.length; i++) {
+        if (this.dataInput[i].value == '') {
+          alert('All field cannot empty!')
+          return;
+        }
         newComponent.append(this.dataInput[i].name, this.dataInput[i].value)
       }
 
@@ -94,7 +119,7 @@ export default {
         var element = document.getElementById('output');
 
           var opt = {
-            margin: 15,
+            margin: 19,
             filename: 'myfile.pdf',
             image: {type: 'jpeg',quality: 0.98},
             html2canvas: {scale: 2},
@@ -105,7 +130,8 @@ export default {
             }
           };
 
-          html2pdf().set(opt).from(element).save();
+          html2pdf().set(opt).from(element).save()
+          // this.html = ''
         // let pdfName = 'test'
         // var doc = new jsPDF({
         // 	orientation: 'p',
@@ -122,7 +148,7 @@ export default {
         //   }
         // )
         // doc.save(pdfName + '.pdf')
-
+        // this.html = ''
       })
       .catch((e) => {
         console.log(e)

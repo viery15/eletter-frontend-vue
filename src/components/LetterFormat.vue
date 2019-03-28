@@ -14,7 +14,7 @@
         <td><button v-on:click="viewData(data.id)" class="btn btn-md btn-info btn-sm" data-toggle="modal" data-target="#modal-view"><font-awesome-icon icon="eye"/></button></td>
         <td style="text-align:center">
           <button v-on:click="editComponent(data.id)" class="btn btn-md btn-warning btn-sm" data-toggle="modal" data-target="#modal-format"><font-awesome-icon icon="pen"/></button>
-          <button v-on:click="destroy(data.id)" class="btn btn-md btn-danger btn-sm"><font-awesome-icon icon="trash"/></button>
+          <button style="margin-left:5px" v-on:click="destroy(data.id)" class="btn btn-md btn-danger btn-sm"><font-awesome-icon icon="trash"/></button>
         </td>
       </tr>
 
@@ -108,6 +108,7 @@
         action:'',
         dataSource:'',
         editorConfig: {
+            tabSpaces: 4,
             // toolbar: [ 'bold', 'italic', 'bulletedList', 'numberedList', 'list', 'Underline', 'Strike' ],
             height: 600
         }
@@ -205,7 +206,6 @@
         this.action = 'update'
         this.letterName = this.dataFormat.find(x => x.id === id).name
         this.formatLetter = this.dataFormat.find(x => x.id === id).output_template
-        console.log(this.dataFormat)
       },
 
       update(id){
