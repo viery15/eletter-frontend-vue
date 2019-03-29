@@ -31,6 +31,13 @@
             <div v-html="input.html_basic"></div>
           </div>
         </div>
+        <div class="form-group row" v-if="inputNik.label != ''">
+          <label for="colFormLabelSm" class="col-md-3 col-form-label col-form-label-sm">Date type</label>
+          <div class="checkbox">
+            <label><input type="checkbox" v-model="dateType"> Indonesian date</label>
+          </div>
+        </div>
+
         </form>
         <div class="form-group row">
           <label for="colFormLabelSm" class="col-md-3 col-form-label col-form-label-sm"></label>
@@ -38,7 +45,7 @@
             <button v-on:click="submit()" v-if="selectedFormat != ''" class="btn btn-primary">Submit</button>
           </div>
         </div>
-
+        <br /><br />
       </div>
     </div>
 
@@ -90,6 +97,7 @@ export default {
       selectedNik:'',
       inputNik:[],
       dataNik:[],
+      dateType: true,
     }
   },
 
@@ -108,6 +116,7 @@ export default {
 
       const newComponent = new URLSearchParams()
       newComponent.append('letter_id', this.inputForm[0].letter_format_id)
+      newComponent.append('Indonesian_date', this.dateType)
       for (var i = 0; i < this.dataInput.length; i++) {
         if (this.dataInput[i].value == '') {
           alert('All field cannot empty!')
@@ -118,7 +127,6 @@ export default {
 
       axios.post('http://127.0.0.1/e-letter/format/submit', newComponent)
       .then((response) => {
-        console.log(this.inputForm)
         this.html = response.data
         var element = document.getElementById('output');
         console.log(this.html)
