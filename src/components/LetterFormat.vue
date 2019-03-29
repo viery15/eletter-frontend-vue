@@ -29,10 +29,21 @@
             <button type="button" class="pull-right close" data-dismiss="modal">&times;</button>
           </div>
           <div class="modal-body">
-            <div class="form-group">
+            <div class="checkbox">
+              <label><input type="checkbox" v-model="parent"> Parent</label>
+            </div>
+            <div class="form-group" v-if="parent == true">
               <label for="usr">Letter Name: * </label>
               <input v-validate="'required'" name="letter_name" v-model="letterName" autocomplete="off" type="text" class="form-control">
               <span style="color:red">{{ errors.first('letter_name') }}</span>
+            </div>
+            <div class="form-group" v-if="parent == false">
+              <label for="usr">Parent: * </label>
+              <select v-model="selectedParent" name="parent" class="form-control form-control-sm">
+                <option value="" disabled selected>Select Parent</option>
+                <option v-for="parent in parents" :value="parent.id">{{parent.name}}</option>
+              </select>
+              <span style="color:red">{{ errors.first('parent') }}</span>
             </div>
             <div class="checkbox">
               <label><input type="checkbox" value="config" v-model="dataSource"> Generate with config variable</label>
@@ -102,11 +113,14 @@
     data(){
       return {
         variable_name: [],
+        parent: true,
         editor: DecoupledEditor,
         formatLetter: '',
         checked: false,
         letterName: '',
+        selectedParent: '',
         dataFormat: [],
+        parents: [],
         view_data:[],
         model: '',
         config: {
@@ -134,9 +148,16 @@
               this.$validator.validate().then(valid => {
                   if (valid) {
                     const newComponent = new URLSearchParams()
-                    newComponent.append('letter_name', this.letterName)
+                    if (this.parent == true) {
+                        newComponent.append('letter_name', this.letterName)
+                    }
+                    else if (this.parent == false) {
+                      newComponent.append('parent_id', this.selectedParent)
+                    }
+
                     newComponent.append('html_output', this.formatLetter)
                     newComponent.append('data_source', this.dataSource)
+                    newComponent.append('parent', this.parent)
 
                     axios.post('http://127.0.0.1/e-letter/format/create', newComponent)
                     .then((response) => {
@@ -163,6 +184,7 @@
       init(){
         this.loadVariable()
         this.loadData()
+        this.loadParent()
       },
 
       onReady( editor )  {
@@ -250,6 +272,11 @@
       async loadData(){
         const response = await axios.get('http://127.0.0.1/e-letter/format')
         this.dataFormat = response.data
+      },
+
+      async loadParent(){
+        const response = await axios.get('http://127.0.0.1/e-letter/format/parent')
+        this.parents = response.data
       },
 
       viewData(id) {

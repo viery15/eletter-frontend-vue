@@ -51,7 +51,13 @@
             <button type="button" class="pull-right close" data-dismiss="modal">&times;</button>
           </div>
           <div class="modal-body">
-            <div id="output" v-html="html"></div>
+            <div id="output">
+              <div v-for="html in html">
+                <div v-html="html"></div>
+                <div class="html2pdf__page-break"></div>
+              </div>
+            </div>
+            <!-- <div id="output" v-html="html"></div> -->
 
           </div>
           <div class="modal-footer">
@@ -61,8 +67,6 @@
 
       </div>
     </div>
-
-
   </div>
 
 </template>
@@ -103,7 +107,7 @@ export default {
       this.dataInput = JSON.parse(JSON.stringify(jQuery('#form-input').serializeArray()))
 
       const newComponent = new URLSearchParams()
-      newComponent.append('output', this.inputForm[0].output_template)
+      newComponent.append('letter_id', this.inputForm[0].letter_format_id)
       for (var i = 0; i < this.dataInput.length; i++) {
         if (this.dataInput[i].value == '') {
           alert('All field cannot empty!')
@@ -114,15 +118,15 @@ export default {
 
       axios.post('http://127.0.0.1/e-letter/format/submit', newComponent)
       .then((response) => {
-        // console.log(response.data)
+        console.log(this.inputForm)
         this.html = response.data
         var element = document.getElementById('output');
-
+        console.log(this.html)
           var opt = {
             margin: 13,
             filename: 'myfile.pdf',
             image: {type: 'jpeg',quality: 0.98},
-            html2canvas: {scale: 2},
+            html2canvas:  { dpi: 192, letterRendering: true },
             jsPDF: {
               unit: 'mm',
               format: 'a4',
@@ -131,6 +135,8 @@ export default {
           };
 
           html2pdf().set(opt).from(element).save()
+
+
           // this.html = ''
         // let pdfName = 'test'
         // var doc = new jsPDF({
