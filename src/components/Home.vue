@@ -32,7 +32,7 @@
           </div>
         </div>
         <div class="form-group row" v-if="inputNik.label != ''">
-          <label for="colFormLabelSm" class="col-md-3 col-form-label col-form-label-sm">Date type</label>
+          <label for="colFormLabelSm" class="col-md-3 col-form-label col-form-label-sm">Date format</label>
           <div class="checkbox">
             <label><input type="checkbox" v-model="dateType"> Indonesian date</label>
           </div>

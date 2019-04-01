@@ -6,14 +6,14 @@
     <table class="table table-striped table-bordered" width="50%">
       <Tr>
         <th>Letter Name</th>
-        <th>HTML Output</th>
-        <th>Action</th>
+        <th style="text-align:center">Action</th>
       </Tr>
       <tr v-for="data in dataFormat">
         <td>{{data.name}}</td>
-        <td><button v-on:click="viewData(data.id)" class="btn btn-md btn-info btn-sm" data-toggle="modal" data-target="#modal-view"><font-awesome-icon icon="eye"/></button></td>
+
         <td style="text-align:center">
-          <button v-on:click="editComponent(data.id)" class="btn btn-md btn-warning btn-sm" data-toggle="modal" data-target="#modal-format"><font-awesome-icon icon="pen"/></button>
+          <button v-on:click="viewData(data.id)" class="btn btn-md btn-info btn-sm" data-toggle="modal" data-target="#modal-view"><font-awesome-icon icon="eye"/></button>
+          <button style="margin-left:5px" v-on:click="editComponent(data.id)" class="btn btn-md btn-warning btn-sm" data-toggle="modal" data-target="#modal-format"><font-awesome-icon icon="pen"/></button>
           <button style="margin-left:5px" v-on:click="destroy(data.id)" class="btn btn-md btn-danger btn-sm"><font-awesome-icon icon="trash"/></button>
         </td>
       </tr>
