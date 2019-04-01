@@ -45,10 +45,27 @@
               </select>
               <span style="color:red">{{ errors.first('parent') }}</span>
             </div>
-            <div class="checkbox">
+            <!-- <div class="checkbox">
               <label><input type="checkbox" value="config" v-model="dataSource"> Generate with config variable</label>
+            </div> -->
+
+            <div class="form-check-inline">
+              <label class="form-check-label">
+                <input v-model="dataSource" type="radio" class="form-check-input" name="optradio" value="">Without generate
+              </label>
             </div>
-            <br />
+            <div class="form-check-inline">
+              <label class="form-check-label">
+                <input v-model="dataSource" type="radio" class="form-check-input" name="optradio" value="single">Generate with single nik
+              </label>
+            </div>
+            <div class="form-check-inline disabled">
+              <label class="form-check-label">
+                <input v-model="dataSource" type="radio" class="form-check-input" name="optradio" value="multiple">Generate with multiple nik
+              </label>
+            </div>
+
+            <br /><br />
             <label for="usr">Letter Format: * </label><br />
             <span style="color:red">{{ errors.first('letter_format') }}</span>
             <!-- <div v-html="formatLetter"></div>

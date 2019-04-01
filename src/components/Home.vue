@@ -17,13 +17,32 @@
             <div class="form-group row" >
               <label for="colFormLabelSm" class="col-md-3 col-form-label col-form-label-sm">{{inputNik.label}}</label>
               <div class="col-md-9">
-                <select v-on:change="changeNik()" v-model="selectedNik" name="type" class="form-control form-control-sm">
+                <select v-if="dataSource == 'single'" v-on:change="changeNik()" v-model="selectedNik" name="type" class="form-control form-control-sm">
                   <option value="" disabled selected>Select NIK</option>
                   <option v-for="(nik, key) in inputNik.nik" >{{nik.nik}}</option>
                 </select>
+                <div v-if="dataSource == 'multiple'">
+                  <div>
+                    <multiselect @input="selectnik()" v-model="value" :options="inputNik.nik" :value="value" :multiple="true" :close-on-select="false" :clear-on-select="false" :preserve-search="true" placeholder="Pick some" label="nik" track-by="nik" :preselect-first="false">
+                      <template slot="selection" slot-scope="{ values, search, isOpen }"><span class="multiselect__single" v-if="values.length &amp;&amp; !isOpen">{{ values.length }} options selected</span></template>
+                    </multiselect>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
+
+        <div v-if="inputForm.data_source == 'multiple'" v-for="value in value">
+          <b>{{value.nik}} - {{value.nama}}</b>
+          <div class="form-group row" v-for="input in inputForm">
+            <label for="colFormLabelSm" class="col-md-3 col-form-label col-form-label-sm">{{input.name}}</label>
+            <div class="col-md-9">
+              <div v-html="input.html_basic"></div>
+            </div>
+          </div>
+        </div>
+
+        <div v-if="inputForm.data_source == 'single'">
 
         <div class="form-group row" v-for="input in inputForm">
           <label for="colFormLabelSm" class="col-md-3 col-form-label col-form-label-sm">{{input.name}}</label>
@@ -31,7 +50,11 @@
             <div v-html="input.html_basic"></div>
           </div>
         </div>
-        <div class="form-group row" v-if="inputNik.label != ''">
+
+        </div>
+
+
+        <div class="form-group row" v-if="inputNik.label != '' && this.inputForm.date != null">
           <label for="colFormLabelSm" class="col-md-3 col-form-label col-form-label-sm">Date format</label>
           <div class="checkbox">
             <label><input type="checkbox" v-model="dateType"> Indonesian date</label>
@@ -81,10 +104,13 @@
 
 <script>
 import axios from 'axios'
-// import jsPDF from 'jspdf'
+import Multiselect from 'vue-multiselect'
 import html2pdf from 'html2pdf.js'
 
 export default {
+  components: {
+    Multiselect
+  },
   name: 'Home',
   data(){
     return {
@@ -93,10 +119,12 @@ export default {
       inputForm: [],
       input:[],
       dataInput:[],
+      value: [],
       html: '',
       selectedNik:'',
       inputNik:[],
       dataNik:[],
+      dataSource: '',
       dateType: true,
     }
   },
@@ -113,10 +141,14 @@ export default {
 
     submit(){
       this.dataInput = JSON.parse(JSON.stringify(jQuery('#form-input').serializeArray()))
-
+      // console.log(this.value)
       const newComponent = new URLSearchParams()
       newComponent.append('letter_id', this.inputForm[0].letter_format_id)
       newComponent.append('Indonesian_date', this.dateType)
+      newComponent.append('data_source', this.dataSource)
+      for (var i = 0; i < this.value.length; i++) {
+        newComponent.append('nik[]', this.value[i].nik)
+      }
       for (var i = 0; i < this.dataInput.length; i++) {
         if (this.dataInput[i].value == '') {
           alert('All field cannot empty!')
@@ -128,8 +160,8 @@ export default {
       axios.post('http://127.0.0.1/e-letter/format/submit', newComponent)
       .then((response) => {
         this.html = response.data
-        var element = document.getElementById('output');
-        console.log(this.html)
+        var element = document.getElementById('output')
+
           var opt = {
             margin: 13,
             filename: 'myfile.pdf',
@@ -144,25 +176,6 @@ export default {
 
           html2pdf().set(opt).from(element).save()
 
-
-          // this.html = ''
-        // let pdfName = 'test'
-        // var doc = new jsPDF({
-        // 	orientation: 'p',
-        // 	unit: 'mm',
-        // 	format: 'a4',
-        // })
-        // doc.fromHTML(
-        //   response.data,
-        //   20,
-        //   20,
-        //
-        //   {
-        //     'width': 170,
-        //   }
-        // )
-        // doc.save(pdfName + '.pdf')
-        // this.html = ''
       })
       .catch((e) => {
         console.log(e)
@@ -173,19 +186,57 @@ export default {
     async loadFormat(){
       const response = await axios.get('http://127.0.0.1/e-letter/format/letterFormat')
       this.dataFormat = response.data
-
     },
 
     async onChange(){
       this.clearForm()
       const response = await axios.get('http://127.0.0.1/e-letter/format/formInput/'+this.selectedFormat)
       this.inputForm = response.data
-
+      // console.log(response.data)
       if (response.data.config != null) {
         this.inputNik = response.data.config
         this.inputNik.label = 'NIK'
-        // console.log(this.inputNik)
+        this.dataSource = response.data.data_source
+        // console.log(this.inputNik.nik)
+        // console.log(this.options)
       }
+    },
+
+    async selectnik(value){
+      // var currentIndex = ''
+      var index = this.value.length
+      if (this.value.length > 0) {
+        var param = this.value[index-1].department
+      }
+      else {
+        var param = 'all'
+      }
+
+      const response = await axios.get('http://127.0.0.1/e-letter/format/changeNik/'+param)
+
+      this.inputNik.nik = response.data
+      this.dataInput = JSON.parse(JSON.stringify(jQuery('#form-input').serializeArray()))
+      var currentIndex = this.value
+
+
+      var asd = 'nama'
+      // console.log(currentIndex)
+
+      for (var key in this.inputForm) {
+        var i = 0
+          if (this.inputForm.hasOwnProperty(key)) {
+            if (this.inputForm[key]['variable_name'] != null) {
+              var varName = this.inputForm[key]['variable_name']
+              // console.log(varName)
+              $('input[name^="'+varName+'"]').each(function() {
+                // console.log(varName)
+                  $(this).val(currentIndex[i][varName])
+                  i++
+              })
+            }
+          }
+      }
+
     },
 
     changeNik(){
@@ -204,3 +255,4 @@ export default {
 
 }
 </script>
+<style src="vue-multiselect/dist/vue-multiselect.min.css"></style>
