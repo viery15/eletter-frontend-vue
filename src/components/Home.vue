@@ -31,10 +31,16 @@
               </div>
             </div>
           </div>
+          <div class="form-group row" v-for="input in inputForm" v-if="input.for == 'single' && inputForm.data_source == 'multiple'">
+            <label for="colFormLabelSm" class="col-md-3 col-form-label col-form-label-sm">{{input.name}}</label>
+            <div class="col-md-9">
+              <div v-html="input.html_basic"></div>
+            </div>
+          </div>
 
-        <div v-if="inputForm.data_source == 'multiple'" v-for="value in value">
+        <div v-for="value in value" v-if="inputForm.data_source == 'multiple'" >
           <b>{{value.nik}} - {{value.nama}}</b>
-          <div class="form-group row" v-for="input in inputForm">
+          <div class="form-group row" v-for="input in inputForm" v-if="input.for != 'single'">
             <label for="colFormLabelSm" class="col-md-3 col-form-label col-form-label-sm">{{input.name}}</label>
             <div class="col-md-9">
               <div v-html="input.html_basic"></div>
@@ -163,7 +169,7 @@ export default {
         var element = document.getElementById('output')
 
           var opt = {
-            margin: 13,
+            margin: 10,
             filename: 'myfile.pdf',
             image: {type: 'jpeg',quality: 0.98},
             html2canvas:  { dpi: 192, letterRendering: true },
@@ -218,9 +224,7 @@ export default {
       this.dataInput = JSON.parse(JSON.stringify(jQuery('#form-input').serializeArray()))
       var currentIndex = this.value
 
-
       var asd = 'nama'
-      // console.log(currentIndex)
 
       for (var key in this.inputForm) {
         var i = 0
