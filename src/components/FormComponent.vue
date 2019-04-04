@@ -211,7 +211,6 @@
         axios.get('http://127.0.0.1/e-letter/component/config')
         .then((response) => {
           this.dataConfig = response.data
-          // console.log(this.dataConfig)
         })
         .catch((e) => {
           console.log(e)
