@@ -6,10 +6,13 @@
         <div class="form-group row">
           <label for="colFormLabelSm" class="col-md-3 col-form-label col-form-label-sm">Letter Format: </label>
           <div class="col-md-9">
-            <select v-on:change="onChange()" v-model="selectedFormat" name="type" class="form-control form-control-sm">
+            <!-- <select v-on:change="onChange()" v-model="selectedFormat" name="type" class="form-control form-control-sm">
               <option value="" disabled selected>Select Letter Format</option>
               <option v-for="format in dataFormat" :value="format.id">{{format.name}}</option>
-            </select>
+            </select> -->
+            <multiselect :value="selectedNik" @input="onChange()" v-model="selectedFormat" :options="dataFormat" :multiple="false" :close-on-select="true" :clear-on-select="false" :preserve-search="true" placeholder="Select format" label="name" track-by="name" :preselect-first="false">
+              <template slot="selection" slot-scope="{ values, search, isOpen }"><span class="multiselect__single" v-if="values.length &amp;&amp; !isOpen">{{ values.length }} options selected</span></template>
+            </multiselect>
           </div>
         </div>
         <form id="form-input">
@@ -23,7 +26,7 @@
                 </select>
                 <div v-if="dataSource == 'multiple'">
                   <div>
-                    <multiselect @input="selectnik()" v-model="value" :options="inputNik.nik" :value="value" :multiple="true" :close-on-select="false" :clear-on-select="false" :preserve-search="true" placeholder="Pick some" label="nik" track-by="nik" :preselect-first="false">
+                    <multiselect @input="selectnik()" v-model="value" :options="inputNik.nik" :value="value" :multiple="true" :close-on-select="false" :clear-on-select="false" :preserve-search="true" placeholder="Pick some NIK" label="nik" track-by="nik" :preselect-first="false">
                       <template slot="selection" slot-scope="{ values, search, isOpen }"><span class="multiselect__single" v-if="values.length &amp;&amp; !isOpen">{{ values.length }} options selected</span></template>
                     </multiselect>
                   </div>
@@ -172,7 +175,8 @@ export default {
             margin: 8,
             filename: 'myfile.pdf',
             image: {type: 'jpeg',quality: 0.98},
-            html2canvas:  { dpi: 192, letterRendering: true },
+            // html2canvas:  { dpi: 192, letterRendering: true },
+            html2canvas:  {scale:5, logging:true},
             jsPDF: {
               unit: 'mm',
               format: 'a4',
@@ -196,7 +200,7 @@ export default {
 
     async onChange(){
       this.clearForm()
-      const response = await axios.get('http://127.0.0.1/e-letter/format/formInput/'+this.selectedFormat)
+      const response = await axios.get('http://127.0.0.1/e-letter/format/formInput/'+this.selectedFormat.id)
       this.inputForm = response.data
       // console.log(response.data)
       if (response.data.config != null) {
