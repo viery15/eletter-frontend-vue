@@ -20,6 +20,7 @@
     "html2pdf.js": "^0.9.1",
     "jquery": "^3.3.1",
     "jspdf": "^1.5.3",
+    "jwt-decode": "^2.2.0",
     "node-sass": "^4.11.0",
     "popper.js": "^1.14.7",
     "sass-loader": "^7.1.0",
@@ -32,7 +33,8 @@
     "vue-multiselect": "^2.1.4",
     "vue-router": "^3.0.2",
     "vue-sweetalert2": "^1.6.4",
-    "vueckeditor": "^0.1.4"
+    "vueckeditor": "^0.1.4",
+    "vuex": "^3.1.0"
   },
   "devDependencies": {
     "@vue/cli-plugin-babel": "^3.5.0",

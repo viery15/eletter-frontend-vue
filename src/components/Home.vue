@@ -112,6 +112,7 @@
 
 
 <script>
+import { mapGetters } from 'vuex'
 import axios from 'axios'
 import Multiselect from 'vue-multiselect'
 import html2pdf from 'html2pdf.js'
@@ -138,7 +139,12 @@ export default {
     }
   },
 
+  computed: {
+    ...mapGetters({ currentUser: 'currentUser' })
+  },
+
   mounted(){
+    this.checkCurrentLogin()
     this.init()
     this.inputNik.label = ''
   },
@@ -146,6 +152,13 @@ export default {
   methods: {
     init(){
       this.loadFormat()
+    },
+
+    checkCurrentLogin(){
+      if (!this.currentUser) {
+        // this.$router.push('/?redirect=' + this.$route.path)
+        this.$router.replace(this.$route.query.redirect || '/login')
+      }
     },
 
     submit(){

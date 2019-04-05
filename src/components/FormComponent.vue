@@ -156,6 +156,7 @@
 
 <script>
   import axios from 'axios'
+  import { mapGetters } from 'vuex'
   export default {
     name: 'FormComponent',
 
@@ -190,7 +191,12 @@
       }
     },
 
+    computed: {
+      ...mapGetters({ currentUser: 'currentUser' })
+    },
+
     mounted() {
+      this.checkCurrentLogin()
       this.init()
       this.getConfig()
       this.getVarConfig()
@@ -205,6 +211,13 @@
         .catch((e) => {
           console.log(e)
         })
+      },
+
+      checkCurrentLogin(){
+        if (!this.currentUser || this.currentUser.admin !== 'admin') {
+          // this.$router.push('/?redirect=' + this.$route.path)
+          this.$router.replace(this.$route.query.redirect || '/login')
+        }
       },
 
       getConfig(){

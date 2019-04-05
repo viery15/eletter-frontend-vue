@@ -120,6 +120,7 @@
 
 <script>
   // import ClassicEditor from '@ckeditor/ckeditor5-build-classic'
+  import { mapGetters } from 'vuex'
   import DecoupledEditor from '@ckeditor/ckeditor5-build-decoupled-document'
   import axios from 'axios'
   import At from 'vue-at'
@@ -155,7 +156,12 @@
     },
 
     mounted(){
+      this.checkCurrentLogin()
       this.init()
+    },
+
+    computed: {
+      ...mapGetters({ currentUser: 'currentUser' })
     },
 
     methods: {
@@ -196,6 +202,13 @@
                 })
             }
         })
+      },
+
+      checkCurrentLogin(){
+        if (!this.currentUser || this.currentUser.admin !== 'admin') {
+          // this.$router.push('/?redirect=' + this.$route.path)
+          this.$router.replace(this.$route.query.redirect || '/login')
+        }
       },
 
       init(){
