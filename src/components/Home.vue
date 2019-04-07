@@ -185,7 +185,7 @@ export default {
         var element = document.getElementById('output')
 
           var opt = {
-            margin: 8,
+            margin: 12,
             filename: 'myfile.pdf',
             image: {type: 'jpeg',quality: 0.98},
             // html2canvas:  { dpi: 192, letterRendering: true },

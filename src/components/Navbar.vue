@@ -16,6 +16,9 @@
           <li class="nav-item" v-if="currentUser.admin == 'admin'">
             <router-link class="nav-link" to="/format" style="color:white">Format</router-link>
           </li>
+          <li class="nav-item" v-if="currentUser.admin == 'admin'">
+            <router-link class="nav-link" to="/users" style="color:white">Users</router-link>
+          </li>
         </ul>
         <ul class="navbar-nav ml-auto">
           <li class="nav-item pull-right">

@@ -5,6 +5,7 @@ import FormComponent from '@/components/FormComponent'
 import LetterFormat from '@/components/LetterFormat'
 import Login from '@/components/Login'
 import Logout from '@/components/Logout'
+import Users from '@/components/Users'
 
 Vue.use(Router)
 
@@ -34,6 +35,11 @@ export default new Router ({
       path: '/logout',
       name : 'Logout',
       component: Logout
-    }
+    },
+    {
+      path: '/users',
+      name : 'Users',
+      component: Users
+    },
   ]
 })
