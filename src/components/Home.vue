@@ -172,7 +172,7 @@ export default {
         newComponent.append('nik[]', this.value[i].nik)
       }
       for (var i = 0; i < this.dataInput.length; i++) {
-        if (this.dataInput[i].value == '') {
+        if (this.dataInput[i].value == '' && this.dataInput[i].name != 'no_ktp') {
           alert('All field cannot empty!')
           return;
         }
@@ -185,7 +185,7 @@ export default {
         var element = document.getElementById('output')
 
           var opt = {
-            margin: 12,
+            margin: 10,
             filename: 'myfile.pdf',
             image: {type: 'jpeg',quality: 0.98},
             // html2canvas:  { dpi: 192, letterRendering: true },
