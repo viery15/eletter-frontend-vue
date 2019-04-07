@@ -107,7 +107,7 @@
 
       methods: {
         checkCurrentLogin(){
-          if (!this.currentUser) {
+          if (!this.currentUser || this.currentUser.role != 'admin') {
             this.$router.replace(this.$route.query.redirect || '/login')
           }
         },

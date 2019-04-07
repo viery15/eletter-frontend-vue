@@ -207,7 +207,7 @@ export default {
     },
 
     async loadFormat(){
-      const response = await axios.get('http://127.0.0.1/e-letter/format/letterFormat')
+      const response = await axios.get('http://127.0.0.1/e-letter/format/letterFormat/'+this.currentUser.nik)
       this.dataFormat = response.data
     },
 
