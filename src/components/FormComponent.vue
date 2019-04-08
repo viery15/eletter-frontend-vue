@@ -5,7 +5,19 @@
       <br /><br />
         <button v-on:click="newComponent()" class="btn btn-info btn-sm" data-toggle="modal" data-target="#modal-form">Add New Component</button>
         <br /><br />
-        <table class="table table-striped table-bordered">
+        <v-client-table
+            :data="components"
+            :columns="columns"
+            :options="optionsTable">
+            <!-- <a slot="action" :href="delete(props.row.id)" slot-scope="props">edit</a> -->
+            <div slot="action" slot-scope="props">
+              <button style="margin-left:5px" v-on:click="editComponent(props.row.id)" class="btn btn-md btn-warning btn-sm" data-toggle="modal" data-target="#modal-form"><font-awesome-icon icon="pen"/></button>
+              <button style="margin-left:5px" v-on:click="destroy(props.row.id)" type="button" class="btn btn-danger btn-sm"><font-awesome-icon icon="trash"/></button>
+              <button style="margin-left:5px" v-on:click="view(props.row.id)" class="btn btn-md btn-info btn-sm" data-toggle="modal" data-target="#modal-view"><font-awesome-icon icon="eye"/></button>
+            </div>
+
+        </v-client-table>
+        <!-- <table class="table table-striped table-bordered">
           <tr>
             <th style="text-align:center" v-for='column in columns'>{{column}}</th>
             <th style="text-align:center">Action</th>
@@ -20,7 +32,7 @@
               <button style="margin-left:5px" v-on:click="view(component.id)" class="btn btn-md btn-info btn-sm" data-toggle="modal" data-target="#modal-view"><font-awesome-icon icon="eye"/></button>
             </td>
           </tr>
-        </table>
+        </table> -->
 
         <div id="modal-form" class="modal fade" role="dialog">
           <div class="modal-dialog modal-lg" style="max-width:900px">
@@ -162,7 +174,17 @@
 
     data: function(){
       return {
-        columns: ['Name', 'Variable Name', 'HTML Basic'],
+        columns: ['name', 'variable_name', 'html_basic', 'action'],
+        optionsTable: {
+            headings: {
+                name: 'Name',
+                variable_name: 'Variable Name',
+                html_basic: 'HTML_Basic',
+                action: 'Action',
+            },
+            sortable: ['name', 'variable_name'],
+            filterable: ['name', 'variable_name']
+        },
         inputType: ['text','number','textarea','date','radio','checkbox','dropdown'],
         components: [],
         modal_header: '',
@@ -485,3 +507,18 @@
     }
   }
 </script>
+<style>
+  tr td:nth-child(4) {
+    min-width: 150px;
+  }
+  tr td:nth-child(5) {
+    min-width: 150px;
+  }
+  tr td:nth-child(2) {
+    min-width: 100px;
+    text-align: center;
+  }
+  tr td:nth-child(1) {
+    min-width: 200px;
+  }
+</style>

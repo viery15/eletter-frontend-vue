@@ -3,7 +3,19 @@
     <br /><br />
     <button v-on:click="createData()" data-toggle="modal" data-target="#modal-format" class="btn btn-info btn-sm"><font-awesome-icon icon="plus"/> New format</button>
     <br /><br />
-    <table class="table table-striped table-bordered" width="50%">
+    <v-client-table
+        :data="dataFormat"
+        :columns="columns"
+        :options="optionsTable">
+        <!-- <a slot="action" :href="delete(props.row.id)" slot-scope="props">edit</a> -->
+        <div slot="action" slot-scope="props">
+          <button v-on:click="viewData(props.row.id)" class="btn btn-md btn-info btn-sm" data-toggle="modal" data-target="#modal-view"><font-awesome-icon icon="eye"/></button>
+          <button style="margin-left:5px" v-on:click="editComponent(props.row.id)" class="btn btn-md btn-warning btn-sm" data-toggle="modal" data-target="#modal-format"><font-awesome-icon icon="pen"/></button>
+          <button style="margin-left:5px" v-on:click="destroy(props.row.id)" class="btn btn-md btn-danger btn-sm"><font-awesome-icon icon="trash"/></button>
+        </div>
+
+    </v-client-table>
+    <!-- <table class="table table-striped table-bordered" width="50%">
       <Tr>
         <th>Letter Name</th>
         <th style="text-align:center">Action</th>
@@ -18,7 +30,7 @@
         </td>
       </tr>
 
-    </table>
+    </table> -->
     <!-- MODAL FORM FORMAT LETTER -->
     <div id="modal-format" class="modal fade" role="dialog">
       <div class="modal-dialog modal-lg">
@@ -130,6 +142,15 @@
     nam: 'LetterFormat',
     data(){
       return {
+        columns: ['name', 'action'],
+        optionsTable: {
+            headings: {
+                name: 'Name',
+                action: 'Action'
+            },
+            sortable: ['name'],
+            filterable: ['name']
+        },
         variable_name: [],
         parent: true,
         editor: DecoupledEditor,

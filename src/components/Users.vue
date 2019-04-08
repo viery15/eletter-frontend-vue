@@ -3,7 +3,17 @@
     <br /><br />
       <button v-on:click="newUser()" class="btn btn-info btn-sm" data-toggle="modal" data-target="#modal-user">Add New User</button>
       <br /><br />
-      <table class="table table-striped table-bordered">
+      <v-client-table
+          :data="listUser"
+          :columns="columns"
+          :options="options">
+          <!-- <a slot="action" :href="delete(props.row.id)" slot-scope="props">edit</a> -->
+          <button v-on:click="destroy(props.row.id)" type="button" class="btn btn-danger btn-sm" slot="action" slot-scope="props"><font-awesome-icon icon="trash"/></button>
+          <div slot="access" slot-scope="access">
+            <h5><span style="margin-left:5px;" v-for="acc in access.row.access" class="badge badge-primary">{{acc}}</span></h5>
+          </div>
+      </v-client-table>
+      <!-- <table class="table table-striped table-bordered">
         <tr>
           <th style="text-align:center">NIK</th>
           <th style="text-align:center">Name</th>
@@ -18,7 +28,7 @@
           <td>{{user.role}}</td>
           <td style="text-align:center"><button v-on:click="destroy(user.id)" type="button" class="btn btn-danger btn-sm"><font-awesome-icon icon="trash"/></button></td>
         </tr>
-      </table>
+      </table> -->
 
       <div id="modal-user" class="modal fade" role="dialog">
         <div class="modal-dialog modal-md">
@@ -78,6 +88,19 @@
 
       data(){
         return {
+          columns: ['name', 'nik', 'access', 'role', 'action'],
+
+          options: {
+              headings: {
+                  name: 'Name',
+                  access: 'Access',
+                  nik: 'NIK',
+                  role: 'Role'
+              },
+              sortable: ['name', 'nik', 'role'],
+              filterable: ['name', 'nik', 'role']
+          },
+
           modal_header: '',
           input: [],
           users: [],
@@ -102,18 +125,19 @@
       },
 
       mounted(){
+        this.checkCurrentLogin()
         this.init()
       },
 
       methods: {
         checkCurrentLogin(){
-          if (!this.currentUser || this.currentUser.role != 'admin') {
+          if (!this.currentUser || this.currentUser.admin !== 'admin') {
+            // this.$router.push('/?redirect=' + this.$route.path)
             this.$router.replace(this.$route.query.redirect || '/login')
           }
         },
 
         init(){
-          this.checkCurrentLogin()
           this.resetForm()
           this.getUsers()
           this.getFormats()
@@ -215,7 +239,7 @@
         },
 
         getFormats(){
-          axios.get('http://127.0.0.1/e-letter/format/letterFormat')
+          axios.get('http://127.0.0.1/e-letter/format/getFormat')
           .then((response) => {
             this.formats = response.data
           })

@@ -17,6 +17,9 @@ import { faPlus } from '@fortawesome/free-solid-svg-icons'
 import { faWindowClose } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 import store from './store'
+import { ClientTable } from 'vue-tables-2';
+
+Vue.use(ClientTable);
 
 require('froala-editor/js/froala_editor.pkgd.min')
 

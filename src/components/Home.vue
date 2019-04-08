@@ -10,7 +10,7 @@
               <option value="" disabled selected>Select Letter Format</option>
               <option v-for="format in dataFormat" :value="format.id">{{format.name}}</option>
             </select> -->
-            <multiselect :value="selectedNik" @input="onChange()" v-model="selectedFormat" :options="dataFormat" :multiple="false" :close-on-select="true" :clear-on-select="false" :preserve-search="true" placeholder="Select format" label="name" track-by="name" :preselect-first="false">
+            <multiselect :value="selectedFormat" @input="onChange()" v-model="selectedFormat" :options="dataFormat" :multiple="false" :close-on-select="true" :clear-on-select="false" :preserve-search="true" placeholder="Select format" label="name" track-by="name" :preselect-first="false">
               <template slot="selection" slot-scope="{ values, search, isOpen }"><span class="multiselect__single" v-if="values.length &amp;&amp; !isOpen">{{ values.length }} options selected</span></template>
             </multiselect>
           </div>
@@ -20,13 +20,16 @@
             <div class="form-group row" >
               <label for="colFormLabelSm" class="col-md-3 col-form-label col-form-label-sm">{{inputNik.label}}</label>
               <div class="col-md-9">
-                <select v-if="dataSource == 'single'" v-on:change="changeNik()" v-model="selectedNik" name="type" class="form-control form-control-sm">
+                <!-- <select v-if="dataSource == 'single'" v-on:change="changeNik()" v-model="selectedNik" name="type" class="form-control form-control-sm">
                   <option value="" disabled selected>Select NIK</option>
                   <option v-for="(nik, key) in inputNik.nik" >{{nik.nik}}</option>
-                </select>
+                </select> -->
+                <multiselect v-if="dataSource == 'single'" @input="changeNik()" v-model="selectedNik" :options="inputNik.nik" :value="value" :multiple="false" :close-on-select="true" :clear-on-select="false" :preserve-search="true" placeholder="Pick some NIK" label="label" track-by="label" :preselect-first="false">
+                  <template slot="selection" slot-scope="{ values, search, isOpen }"><span class="multiselect__single" v-if="values.length &amp;&amp; !isOpen">{{ values.length }} options selected</span></template>
+                </multiselect>
                 <div v-if="dataSource == 'multiple'">
                   <div>
-                    <multiselect @input="selectnik()" v-model="value" :options="inputNik.nik" :value="value" :multiple="true" :close-on-select="false" :clear-on-select="false" :preserve-search="true" placeholder="Pick some NIK" label="nik" track-by="nik" :preselect-first="false">
+                    <multiselect @input="selectnik()" v-model="value" :options="inputNik.nik" :value="value" :multiple="true" :close-on-select="false" :clear-on-select="false" :preserve-search="true" placeholder="Pick some NIK" label="label" track-by="label" :preselect-first="false">
                       <template slot="selection" slot-scope="{ values, search, isOpen }"><span class="multiselect__single" v-if="values.length &amp;&amp; !isOpen">{{ values.length }} options selected</span></template>
                     </multiselect>
                   </div>
@@ -61,7 +64,6 @@
         </div>
 
         </div>
-
 
         <div class="form-group row" v-if="inputNik.label != '' && this.inputForm.date != null">
           <label for="colFormLabelSm" class="col-md-3 col-form-label col-form-label-sm">Date format</label>
@@ -186,7 +188,7 @@ export default {
 
           var opt = {
             margin: 10,
-            filename: 'myfile.pdf',
+            filename: this.selectedFormat.name,
             image: {type: 'jpeg',quality: 0.98},
             // html2canvas:  { dpi: 192, letterRendering: true },
             html2canvas:  {scale:5, logging:true},
@@ -215,13 +217,12 @@ export default {
       this.clearForm()
       const response = await axios.get('http://127.0.0.1/e-letter/format/formInput/'+this.selectedFormat.id)
       this.inputForm = response.data
-      // console.log(response.data)
+
       if (response.data.config != null) {
         this.inputNik = response.data.config
         this.inputNik.label = 'NIK'
         this.dataSource = response.data.data_source
-        // console.log(this.inputNik.nik)
-        // console.log(this.options)
+
       }
     },
 
@@ -261,7 +262,7 @@ export default {
     },
 
     changeNik(){
-      var findnik = this.inputNik.nik.find(x => x.nik === this.selectedNik)
+      var findnik = this.inputNik.nik.find(x => x.nik === this.selectedNik.nik)
       for(var i in findnik){
         if (i != 'nik') {
           $('#'+i).val(findnik[i])

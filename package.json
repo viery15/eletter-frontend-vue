@@ -33,7 +33,10 @@
     "vue-multiselect": "^2.1.4",
     "vue-router": "^3.0.2",
     "vue-sweetalert2": "^1.6.4",
+    "vue-tables-2": "^1.4.70",
     "vueckeditor": "^0.1.4",
+    "vuejs-datatable": "^1.7.0",
+    "vuetable-2": "^1.7.5",
     "vuex": "^3.1.0"
   },
   "devDependencies": {
