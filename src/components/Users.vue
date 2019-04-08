@@ -7,9 +7,14 @@
           :data="listUser"
           :columns="columns"
           :options="options">
-          <!-- <a slot="action" :href="delete(props.row.id)" slot-scope="props">edit</a> -->
-          <button v-on:click="destroy(props.row.id)" type="button" class="btn btn-danger btn-sm" slot="action" slot-scope="props"><font-awesome-icon icon="trash"/></button>
+
+          <div slot="action" slot-scope="props">
+            <button v-on:click="edit(props.row.id)" type="button" class="btn btn-warning btn-sm" data-toggle="modal" data-target="#modal-user"><font-awesome-icon icon="pen"/></button>
+            <button style="margin-left:5px;" v-on:click="destroy(props.row.id)" type="button" class="btn btn-danger btn-sm"><font-awesome-icon icon="trash"/></button>
+          </div>
+
           <div slot="access" slot-scope="access">
+            <!-- {{access.row.access}} -->
             <h5><span style="margin-left:5px;" v-for="acc in access.row.access" class="badge badge-primary">{{acc}}</span></h5>
           </div>
       </v-client-table>
@@ -65,7 +70,7 @@
             </div>
             <div class="modal-footer">
               <button v-if="modal_header == 'New User'" v-on:click="addUser()" type="button" class="btn btn-save btn-success" >Save</button>
-              <button v-if="modal_header == 'Edit User'" v-on:click="updateComponent(inputComponent.id)" type="button" class="btn btn-save btn-success">Update</button>
+              <button v-if="modal_header == 'Edit User'" v-on:click="updateUser(selectedNik.nik)" type="button" class="btn btn-save btn-success">Update</button>
               <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
             </div>
           </div>
@@ -97,8 +102,8 @@
                   nik: 'NIK',
                   role: 'Role'
               },
-              sortable: ['name', 'nik', 'role'],
-              filterable: ['name', 'nik', 'role']
+              sortable: ['name', 'nik', 'access', 'role', 'action'],
+              filterable: ['name', 'nik', 'role'],
           },
 
           modal_header: '',
@@ -115,8 +120,9 @@
             }
           ],
           selectedNik: '',
-          selectedFormat: '',
+          selectedFormat: [],
           selectedRole:'',
+          selectedId: '',
         }
       },
 
@@ -171,6 +177,29 @@
             })
         },
 
+        edit(id){
+          this.modal_header = 'Edit User'
+          axios.get('http://127.0.0.1/e-letter/user/edit/'+id)
+          .then((response) => {
+            // console.log(response.data)
+            var nik = response.data.nik
+            var role = response.data.role
+            var access = response.data.access
+            this.selectedId = response.data.id
+            this.selectedFormat = []
+            // console.log(access)
+            this.selectedRole = this.roleList.find(x => x.role === role)
+            this.selectedNik = this.users.find(x => x.nik === nik)
+            for (var i = 0; i < access.length; i++) {
+              this.selectedFormat[i] = this.formats.find(x => x.name === access[i])
+            }
+
+          })
+          .catch((e) => {
+            console.log(e)
+          })
+        },
+
         deleteUser(id){
           axios.delete('http://127.0.0.1/e-letter/user/delete/'+id)
           .then((response) => {
@@ -186,6 +215,46 @@
           .catch((e) => {
             console.log(e)
           })
+        },
+
+        updateUser(nik) {
+          if (this.selectedNik == '' || this.selectedRole == '') {
+            alert('All field cannot empty')
+          }
+          else if(this.selectedRole.role == 'user' && this.selectedFormat == '') {
+            alert('Access field cannot empty')
+          }
+          else {
+            const newUser = new URLSearchParams()
+            newUser.append('nik', this.selectedNik.nik)
+            newUser.append('role', this.selectedRole.role)
+            newUser.append('name', this.selectedNik.nama)
+
+            if (this.selectedFormat != '') {
+              for (var i = 0; i < this.selectedFormat.length; i++) {
+                newUser.append('access[]', this.selectedFormat[i].id)
+              }
+            }
+            else {
+              newUser.append('access', this.selectedFormat)
+            }
+
+            axios.post('http://127.0.0.1/e-letter/user/update/'+this.selectedId, newUser)
+            .then((response) => {
+              this.init()
+              $('#modal-user').modal('hide');
+              this.$swal({
+                position: 'top-end',
+                type: 'success',
+                title: 'Data updated successful',
+                showConfirmButton: false,
+                timer: 1500
+              })
+            })
+            .catch((e) => {
+              console.log(e)
+            })
+          }
         },
 
         addUser(){

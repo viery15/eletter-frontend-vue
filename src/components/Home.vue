@@ -217,7 +217,7 @@ export default {
       this.clearForm()
       const response = await axios.get('http://127.0.0.1/e-letter/format/formInput/'+this.selectedFormat.id)
       this.inputForm = response.data
-
+      console.log(response.data)
       if (response.data.config != null) {
         this.inputNik = response.data.config
         this.inputNik.label = 'NIK'

@@ -182,7 +182,7 @@
                 html_basic: 'HTML_Basic',
                 action: 'Action',
             },
-            sortable: ['name', 'variable_name'],
+            sortable: ['name', 'variable_name', 'html_basic', 'action'],
             filterable: ['name', 'variable_name']
         },
         inputType: ['text','number','textarea','date','radio','checkbox','dropdown'],
@@ -508,7 +508,10 @@
   }
 </script>
 <style>
-  tr td:nth-child(4) {
+  .VueTables__sortable  {
+    min-width: 150px;
+  }
+  /* tr td:nth-child(4) {
     min-width: 150px;
   }
   tr td:nth-child(5) {
@@ -520,5 +523,5 @@
   }
   tr td:nth-child(1) {
     min-width: 200px;
-  }
+  } */
 </style>
