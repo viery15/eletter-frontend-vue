@@ -37,7 +37,9 @@
     name: 'Login',
     data(){
       return {
-        password: '',
+        url: 'http://127.0.0.1/e-letter/',
+        // url: 'http://hrd.citratubindo.co.id/hr_program/giselle/application/index.php/',
+        password: '12345',
         nik:'',
         error:'',
       }
@@ -63,7 +65,7 @@
         newComponent.append('nik', this.nik)
         newComponent.append('password', this.password)
 
-        axios.post('http://127.0.0.1/e-letter/user/login/',newComponent)
+        axios.post(this.url+'user/login/',newComponent)
         .then(response => {
           this.loginsuccessful(response)
         })

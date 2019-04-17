@@ -44,6 +44,9 @@
             <div class="checkbox">
               <label><input type="checkbox" v-model="parent"> Parent</label>
             </div>
+            <div class="checkbox">
+              <label><input type="checkbox" v-model="pageNumber"> Include auto page number</label>
+            </div>
             <div class="form-group" v-if="parent == true">
               <label for="usr">Letter Name: * </label>
               <input v-validate="'required'" name="letter_name" v-model="letterName" autocomplete="off" type="text" class="form-control">
@@ -143,6 +146,9 @@
     data(){
       return {
         columns: ['name', 'action'],
+        url: 'http://127.0.0.1/e-letter/',
+        // url: 'http://hrd.citratubindo.co.id/hr_program/giselle/application/index.php/',
+
         optionsTable: {
             headings: {
                 name: 'Name',
@@ -152,6 +158,7 @@
             filterable: ['name']
         },
         variable_name: [],
+        pageNumber: false,
         parent: true,
         editor: DecoupledEditor,
         formatLetter: '',
@@ -202,8 +209,9 @@
                     newComponent.append('html_output', this.formatLetter)
                     newComponent.append('data_source', this.dataSource)
                     newComponent.append('parent', this.parent)
+                    newComponent.append('pageNumber', this.pageNumber)
 
-                    axios.post('http://127.0.0.1/e-letter/format/create', newComponent)
+                    axios.post(this.url+'format/create', newComponent)
                     .then((response) => {
                       this.init()
                       $('#modal-format').modal('hide');
@@ -252,7 +260,7 @@
       },
 
       deleteComponent(id){
-        axios.delete('http://127.0.0.1/e-letter/format/delete/' + id)
+        axios.delete(this.url+'format/delete/' + id)
         .then(response => {
           this.init()
         })
@@ -287,26 +295,45 @@
         this.action = 'update'
         this.letterName = this.dataFormat.find(x => x.id === id).name
         this.formatLetter = this.dataFormat.find(x => x.id === id).output_template
+        this.editId = id
+        axios.get(this.url+'format/edit/'+id)
+        .then((response) => {
+          this.dataSource = response.data.data_source
+          this.pageNumber = response.data.page_number
+        })
+        .catch((e) => {
+          console.log(e)
+        })
       },
 
-      update(id){
+      update(){
         this.$validator.validate().then(valid => {
             if (valid) {
               const newComponent = new URLSearchParams()
               newComponent.append('letter_name', this.letterName)
               newComponent.append('html_output', this.formatLetter)
+              newComponent.append('pageNumber', this.pageNumber)
+              if (this.parent == true) {
+                  newComponent.append('letter_name', this.letterName)
+              }
+              else if (this.parent == false) {
+                newComponent.append('parent_id', this.selectedParent)
+              }
 
-              axios.post('http://127.0.0.1/e-letter/format/update/'+id, newComponent)
+              newComponent.append('data_source', this.dataSource)
+              newComponent.append('parent', this.parent)
+
+              axios.post(this.url+'format/update/'+this.editId, newComponent)
               .then((response) => {
-                // this.init()
-                // $('#modal-form').modal('hide');
-                // this.$swal({
-                //   position: 'top-end',
-                //   type: 'success',
-                //   title: 'Data updated successful',
-                //   showConfirmButton: false,
-                //   timer: 1500
-                // })
+                this.init()
+                $('#modal-format').modal('hide');
+                this.$swal({
+                  position: 'top-end',
+                  type: 'success',
+                  title: 'Data updated successful',
+                  showConfirmButton: false,
+                  timer: 1500
+                })
               })
               .catch((e) => {
                 console.log(e)
@@ -316,17 +343,17 @@
       },
 
       async loadVariable(){
-        const response = await axios.get('http://127.0.0.1/e-letter/component/variableName')
+        const response = await axios.get(this.url+'component/variableName')
         this.variable_name = response.data
       },
 
       async loadData(){
-        const response = await axios.get('http://127.0.0.1/e-letter/format')
+        const response = await axios.get(this.url+'format')
         this.dataFormat = response.data
       },
 
       async loadParent(){
-        const response = await axios.get('http://127.0.0.1/e-letter/format/parent')
+        const response = await axios.get(this.url+'format/parent')
         this.parents = response.data
       },
 

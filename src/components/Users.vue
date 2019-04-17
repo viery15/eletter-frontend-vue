@@ -77,6 +77,7 @@
 
         </div>
       </div>
+      <!-- <img src="logo.png"/> -->
   </div>
 </template>
 
@@ -94,6 +95,9 @@
       data(){
         return {
           columns: ['name', 'nik', 'access', 'role', 'action'],
+          url: 'http://127.0.0.1/e-letter/',
+          // url: 'http://hrd.citratubindo.co.id/hr_program/giselle/application/index.php/',
+
 
           options: {
               headings: {
@@ -179,7 +183,7 @@
 
         edit(id){
           this.modal_header = 'Edit User'
-          axios.get('http://127.0.0.1/e-letter/user/edit/'+id)
+          axios.get(this.url+'user/edit/'+id)
           .then((response) => {
             // console.log(response.data)
             var nik = response.data.nik
@@ -201,7 +205,7 @@
         },
 
         deleteUser(id){
-          axios.delete('http://127.0.0.1/e-letter/user/delete/'+id)
+          axios.delete(this.url+'user/delete/'+id)
           .then((response) => {
             this.init()
             this.$swal({
@@ -239,7 +243,7 @@
               newUser.append('access', this.selectedFormat)
             }
 
-            axios.post('http://127.0.0.1/e-letter/user/update/'+this.selectedId, newUser)
+            axios.post(this.url+'user/update/'+this.selectedId, newUser)
             .then((response) => {
               this.init()
               $('#modal-user').modal('hide');
@@ -257,7 +261,15 @@
           }
         },
 
+        resetForm(){
+          this.selectedNik = ''
+          this.selectedRole = ''
+          this.selectedFormat = []
+          this.selectedId = ''
+        },
+
         addUser(){
+
           if (this.selectedNik == '' || this.selectedRole == '') {
             alert('All field cannot empty')
           }
@@ -279,9 +291,10 @@
               newUser.append('access', this.selectedFormat)
             }
 
-            axios.post('http://127.0.0.1/e-letter/user/create', newUser)
+            axios.post(this.url+'user/create', newUser)
             .then((response) => {
               this.init()
+              this.resetForm()
               $('#modal-user').modal('hide');
               this.$swal({
                 position: 'top-end',
@@ -292,13 +305,13 @@
               })
             })
             .catch((e) => {
-              console.log(e)
+              alert(this.selectedNik.nik+' already registered')
             })
           }
         },
 
         getUsers(){
-          axios.get('http://127.0.0.1/e-letter/user/configUser')
+          axios.get(this.url+'user/configUser')
           .then((response) => {
             this.users = response.data
           })
@@ -308,7 +321,7 @@
         },
 
         getFormats(){
-          axios.get('http://127.0.0.1/e-letter/format/getFormat')
+          axios.get(this.url+'format/getFormat')
           .then((response) => {
             this.formats = response.data
           })
@@ -318,7 +331,7 @@
         },
 
         dataUser(){
-          axios.get('http://127.0.0.1/e-letter/user/')
+          axios.get(this.url+'user/')
           .then((response) => {
             this.listUser = response.data
           })

@@ -56,19 +56,32 @@
 
         <div v-if="inputForm.data_source == 'single'">
 
-        <div class="form-group row" v-for="input in inputForm">
-          <label for="colFormLabelSm" class="col-md-3 col-form-label col-form-label-sm">{{input.name}}</label>
-          <div class="col-md-9">
-            <div v-html="input.html_basic"></div>
+        <div class="form-group row" v-for="(input, key) in inputForm">
+          <!-- <div v-if="key != 'config' || key != 'data_source' || key != 'date'"> -->
+            <label for="colFormLabelSm" class="col-md-3 col-form-label col-form-label-sm">{{input.name}}</label>
+            <div class="col-md-9">
+              <div v-html="input.html_basic"></div>
+            </div>
+          <!-- </div> -->
+        </div>
+
+        </div>
+
+        <div v-if="inputForm.data_source == 'single'" style="margin-top:-70px;">
+          <div class="form-group row" v-if="inputNik.label != '' && this.inputForm.date != null">
+            <label for="colFormLabelSm" class="col-md-3 col-form-label col-form-label-sm">Date format</label>
+            <div class="checkbox">
+              <label><input type="checkbox" v-model="dateType"> Indonesian</label>
+            </div>
           </div>
         </div>
 
-        </div>
-
-        <div class="form-group row" v-if="inputNik.label != '' && this.inputForm.date != null">
-          <label for="colFormLabelSm" class="col-md-3 col-form-label col-form-label-sm">Date format</label>
-          <div class="checkbox">
-            <label><input type="checkbox" v-model="dateType"> Indonesian date</label>
+        <div v-if="inputForm.data_source == 'multiple'">
+          <div class="form-group row" v-if="inputNik.label != '' && this.inputForm.date != null">
+            <label for="colFormLabelSm" class="col-md-3 col-form-label col-form-label-sm">Date format</label>
+            <div class="checkbox">
+              <label><input type="checkbox" v-model="dateType"> Indonesian</label>
+            </div>
           </div>
         </div>
 
@@ -95,6 +108,7 @@
             <div id="output">
               <div v-for="html in html">
                 <div v-html="html"></div>
+
                 <div class="html2pdf__page-break"></div>
               </div>
             </div>
@@ -138,6 +152,10 @@ export default {
       dataNik:[],
       dataSource: '',
       dateType: true,
+      url: 'http://127.0.0.1/e-letter/',
+      // url: 'http://hrd.citratubindo.co.id/hr_program/giselle/application/index.php/',
+
+
     }
   },
 
@@ -170,6 +188,9 @@ export default {
       newComponent.append('letter_id', this.inputForm[0].letter_format_id)
       newComponent.append('Indonesian_date', this.dateType)
       newComponent.append('data_source', this.dataSource)
+      if (this.dataSource == 'single') {
+        newComponent.append('nik', this.selectedNik.nik)
+      }
       for (var i = 0; i < this.value.length; i++) {
         newComponent.append('nik[]', this.value[i].nik)
       }
@@ -181,25 +202,42 @@ export default {
         newComponent.append(this.dataInput[i].name, this.dataInput[i].value)
       }
 
-      axios.post('http://127.0.0.1/e-letter/format/submit', newComponent)
+      axios.post(this.url+'format/submit', newComponent)
       .then((response) => {
         this.html = response.data
         var element = document.getElementById('output')
 
           var opt = {
-            margin: 10,
+            margin : [10,10,17,10],
             filename: this.selectedFormat.name,
             image: {type: 'jpeg',quality: 0.98},
-            // html2canvas:  { dpi: 192, letterRendering: true },
             html2canvas:  {scale:5, logging:true},
+
             jsPDF: {
               unit: 'mm',
               format: 'a4',
-              orientation: 'portrait'
+              orientation: 'portrait',
+              // margin: {top: 10, bottom: 0, left: 10},
             }
           };
 
-          html2pdf().set(opt).from(element).save()
+
+          if (this.selectedFormat.page_number == 'true') {
+            html2pdf().from(element).set(opt).toPdf().get('pdf').then(function (pdf) {
+              var totalPages = pdf.internal.getNumberOfPages();
+
+              for (i = 1; i <= totalPages; i++) {
+                pdf.setPage(i);
+                pdf.setFontSize(10);
+                pdf.setTextColor(150);
+                pdf.text('Page ' + i + ' of ' + totalPages, pdf.internal.pageSize.getWidth() - 30, pdf.internal.pageSize.getHeight() - 10);
+              }
+            }).save();
+          }
+          else {
+            html2pdf().set(opt).from(element).save()
+          }
+
 
       })
       .catch((e) => {
@@ -209,13 +247,13 @@ export default {
     },
 
     async loadFormat(){
-      const response = await axios.get('http://127.0.0.1/e-letter/format/letterFormat/'+this.currentUser.nik)
+      const response = await axios.get(this.url+'format/letterFormat/'+this.currentUser.nik)
       this.dataFormat = response.data
     },
 
     async onChange(){
       this.clearForm()
-      const response = await axios.get('http://127.0.0.1/e-letter/format/formInput/'+this.selectedFormat.id)
+      const response = await axios.get(this.url+'format/formInput/'+this.selectedFormat.id)
       this.inputForm = response.data
       console.log(response.data)
       if (response.data.config != null) {
@@ -236,7 +274,7 @@ export default {
         var param = 'all'
       }
 
-      const response = await axios.get('http://127.0.0.1/e-letter/format/changeNik/'+param)
+      const response = await axios.get(this.url+'format/changeNik/'+param)
 
       this.inputNik.nik = response.data
       this.dataInput = JSON.parse(JSON.stringify(jQuery('#form-input').serializeArray()))
@@ -277,4 +315,31 @@ export default {
 
 }
 </script>
+<style>
+.pageNumber {
+    display: table-footer-group;
+}
+
+.pageNumber:after {
+    counter-increment: page;
+    content:"Halaman " counter(page);
+    left: 0;
+    top: 100%;
+    white-space: nowrap;
+    z-index: 20;
+    -moz-border-radius: 5px;
+    -moz-box-shadow: 0px 0px 4px #222;
+    background-image: -moz-linear-gradient(top, #eeeeee, #cccccc);
+}
+.content {
+    display: table;
+}
+@media all {
+ .page-break  { display: none; }
+}
+
+@media print {
+ .page-break  { display: block; page-break-before: always; }
+}
+</style>
 <style src="vue-multiselect/dist/vue-multiselect.min.css"></style>

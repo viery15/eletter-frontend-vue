@@ -1,3 +1,3 @@
 module.exports = {
-  // publicPath: 'letter/'
+  // publicPath: 'hr_program/giselle'
 }

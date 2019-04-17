@@ -174,6 +174,10 @@
 
     data: function(){
       return {
+        url: 'http://127.0.0.1/e-letter/',
+        // url: 'http://hrd.citratubindo.co.id/hr_program/giselle/application/index.php/',
+
+
         columns: ['name', 'variable_name', 'html_basic', 'action'],
         optionsTable: {
             headings: {
@@ -226,7 +230,7 @@
 
     methods: {
       init(){
-        axios.get('http://127.0.0.1/e-letter/component/index2')
+        axios.get(this.url+'component/index2')
         .then((response) => {
           this.components = response.data
         })
@@ -243,7 +247,7 @@
       },
 
       getConfig(){
-        axios.get('http://127.0.0.1/e-letter/component/config')
+        axios.get(this.url+'component/config')
         .then((response) => {
           this.dataConfig = response.data
         })
@@ -253,7 +257,7 @@
       },
 
       getVarConfig(){
-        axios.get('http://127.0.0.1/e-letter/component/allConfigVariable')
+        axios.get(this.url+'component/allConfigVariable')
         .then((response) => {
           this.variableConfig = response.data
         })
@@ -269,7 +273,7 @@
         this.inputComponent = {}
         this.errors.clear()
         this.modal_header = 'New Component'
-        const response = await axios.get('http://127.0.0.1/e-letter/component/list_input')
+        const response = await axios.get(this.url+'component/list_input')
         this.data_input = response.data
         this.count = 1
         this.countOption = 1
@@ -310,7 +314,7 @@
                 }
               }
 
-              axios.post('http://127.0.0.1/e-letter/component/create', newComponent)
+              axios.post(this.url+'component/create', newComponent)
               .then((response) => {
 
                 this.init()
@@ -324,14 +328,14 @@
                 })
               })
               .catch((e) => {
-                console.log(e)
+              alert(this.inputComponent.variable_name+' alreay registered')
               })
             }
           })
       },
 
       deleteComponent(id){
-        axios.delete('http://127.0.0.1/e-letter/component/delete/' + id)
+        axios.delete(this.url+'component/delete/' + id)
         .then(response => {
           this.init()
           this.getConfig()
@@ -445,7 +449,7 @@
                 }
               }
 
-              axios.post('http://127.0.0.1/e-letter/component/update/'+id, newComponent)
+              axios.post(this.url+'component/update/'+id, newComponent)
               .then((response) => {
 
                 this.init()

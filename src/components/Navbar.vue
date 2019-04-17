@@ -1,6 +1,6 @@
 <template>
     <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
-      <a class="navbar-brand" href="#">GISELLE</a>
+      <a class="navbar-brand" v-on:click="info()" href="#">GISELLE</a>
       <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
       </button>
@@ -21,6 +21,9 @@
           </li>
         </ul>
         <ul class="navbar-nav ml-auto">
+          <li v-if="currentUser.admin == 'admin'" class="nav-item pull-right">
+            <a style="color:white" class="nav-link" href="/USERGUIDE.pdf" download>User Guide</a>
+          </li>
           <li class="nav-item pull-right">
             <a style="color:white" class="nav-link">{{currentUser.nik}}</a>
           </li>
@@ -39,6 +42,22 @@ import { mapGetters } from 'vuex'
     name: 'Navbar',
     computed: {
       ...mapGetters({ currentUser: 'currentUser' })
+    },
+
+    methods: {
+      info(){
+        this.$swal({
+          title: '<strong>GISELLE</strong>',
+          type: 'info',
+          html:
+            'Generator of Integrated System For Employment Letter',
+          showCloseButton: false,
+          showCancelButton: false,
+          focusConfirm: false,
+          confirmButtonText:
+            'Close',
+        })
+      }
     }
 
   }
