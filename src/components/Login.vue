@@ -6,7 +6,7 @@
         <div class="card card-signin my-5">
           <div class="card-body">
             <h5 class="card-title text-center">Sign In</h5>
-            <form class="form-signin">
+            <form class="form-signin" v-on:submit.prevent="login()">
               <div class="form-label-group">
                 <label for="inputEmail">NIK</label>
                 <input v-model="nik" type="text" class="form-control" placeholder="NIK" required autofocus>
@@ -20,7 +20,7 @@
               </div>
               <br />
 
-              <button v-on:click="login()" class="btn btn-lg btn-primary btn-block text-uppercase" type="button">Sign in</button>
+              <button class="btn btn-lg btn-primary btn-block text-uppercase" type="submit">Sign in</button>
 
             </form>
           </div>
