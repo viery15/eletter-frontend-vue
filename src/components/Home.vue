@@ -56,7 +56,7 @@
 
         <div v-if="inputForm.data_source == 'single'">
 
-        <div class="form-group row" v-for="(input, key) in inputForm">
+        <div class="form-group row" v-for="input in inputForm">
           <!-- <div v-if="key != 'config' || key != 'data_source' || key != 'date'"> -->
             <label for="colFormLabelSm" class="col-md-3 col-form-label col-form-label-sm">{{input.name}}</label>
             <div class="col-md-9">
@@ -86,7 +86,7 @@
         </div>
 
         </form>
-        <div class="form-group row">
+        <div class="form-group row" style="margin-top:30px">
           <label for="colFormLabelSm" class="col-md-3 col-form-label col-form-label-sm"></label>
           <div class="col-md-9">
             <button v-on:click="submit()" v-if="selectedFormat != ''" class="btn btn-primary">Submit</button>
